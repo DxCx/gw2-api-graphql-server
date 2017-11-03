@@ -7,6 +7,7 @@ import * as helmet from 'helmet';
 import * as morgan from 'morgan';
 
 import * as DataLoader from 'dataloader';
+import { default as gw2client } from 'gw2api-client';
 
 // Default port or given one.
 export const GRAPHQL_ROUTE = "/graphql";
@@ -28,6 +29,24 @@ function verbosePrint(port, enableGraphiql) {
   }
 }
 
+const api = gw2client();
+const itemsLoader = new DataLoader((itemIds) => {
+  return api.items().many(itemIds)
+  .then((items) => items.map((item) => {
+    if ( !item.details ) {
+      return item;
+    }
+
+    return {
+      ...item,
+      details: {
+        root_type: item.type,
+        ...item.details,
+      },
+    };
+  }));
+});
+
 export function main(options: IMainOptions) {
   let app = express();
 
@@ -41,6 +60,7 @@ export function main(options: IMainOptions) {
 
   app.use(GRAPHQL_ROUTE, bodyParser.json(), graphqlExpress({
     context: {
+      itemsLoader,
     },
     schema: Schema,
   }));

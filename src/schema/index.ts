@@ -3,7 +3,7 @@ import {makeExecutableSchema} from 'graphql-schema-tools';
 
 /* tslint:disable:no-var-requires */
 const modules = [
-  require("./modules/query"),
+  require("./modules/item"),
 ];
 
 const resolvers = modules.map((m) => m.resolver).filter((res) => !!res);
