@@ -8,7 +8,7 @@ var distPath = function ( name ) {
   if ( undefined === name ) {
     return path.join('dist');
   }
-  
+
   return path.join('dist', name);
 };
 
@@ -46,6 +46,9 @@ var webpack_opts = {
     loaders: [{
       test: /\.ts$/,
       loaders: 'awesome-typescript-loader'
+    }, {
+      test: /\.graphql$/,
+      loaders: 'raw-loader'
     }]
   },
   externals: [nodeExternals()]

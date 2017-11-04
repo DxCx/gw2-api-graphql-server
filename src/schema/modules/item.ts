@@ -396,7 +396,7 @@ type Item {
 # Root Query
 type Query {
   item(itemId: ID!): Item
-  items(itemIds: [ID!]): [Item]
+  items(itemIds: [ID!]): [Item!]!
 }
 `;
 

@@ -16,39 +16,5 @@ const Schema: GraphQLSchema = makeExecutableSchema({
 
 export {Schema};
 
-export const defaultQuery = `query {
- items(itemIds: [43772, 12452, 67457]) {
-    id
-    name
-    level
-    type
-    flags
-    rarity
-    game_types
-    vendor_value
-    details {
-      ... on ItemConsumableDetails {
-        name
-        description
-        color_id
-      }
-      ... on ItemArmorDetails {
-        type
-        defense
-        infix_upgrade {
-          attributes {
-            modifier
-            attribute
-          }
-          buff {
-            skill_id
-            description
-          }
-        }
-        infusion_slots {
-          item_id
-        }
-      }
-    }
-  }
-}`;
+const defaultQuery = require('./defaultQuery.graphql');
+export {defaultQuery};
