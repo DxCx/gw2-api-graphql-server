@@ -21,14 +21,14 @@ type Trait {
   # Either Major or Minor depending on the trait's slot. Minor traits are the ones given immediately when choosing a specialization.
   slot: String!
 
-  # A list of tooltip facts associated with the trait itself. (See below.)
-  # facts: [Fact!]
+  # A list of tooltip facts associated with the trait itself.
+  facts: [Fact!]
 
   # A list of additions or changes to tooltip facts where there is interplay between traits. (See below.)
-  # traited_facts: [Fact!]
+  traited_facts: [Fact!]
 
-  # A list of skills which may be triggered by the trait. (See below.)
-  skills: [Skill!]
+  # A list of skills which may be triggered by the trait.
+  skills: [BaseSkill!]
 }
 
 # Root Query

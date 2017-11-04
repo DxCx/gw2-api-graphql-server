@@ -1,4 +1,24 @@
 export const typeDef = `
+type BaseSkill {
+	# The skill id.
+	id: ID!
+
+	# The skill name.
+	name: String!
+
+	# The skill description.
+	description: String
+
+	# A URL to an icon of the skill.
+	icon: String!
+
+	# An array of skill fact objects describing the skill's effect.
+	facts: [Fact!]
+
+	# An array of skill fact objects that may apply to the skill, dependent on the player's trait choices.
+	traited_facts: [Fact!]
+}
+
 type Skill {
 	# The skill id.
 	id: ID!
@@ -38,11 +58,11 @@ type Skill {
 	# Weapon_[1-5] - Weapon skills 1-5.
 	slot: String!
 
-	# An array of skill fact objects describing the skill's effect. (See below.)
-	# facts: [Fact!]
+	# An array of skill fact objects describing the skill's effect.
+	facts: [Fact!]
 
 	# An array of skill fact objects that may apply to the skill, dependent on the player's trait choices.
-	# traited_facts: [Fact!]
+	traited_facts: [Fact!]
 
 	# An array of categories the skill falls under. Mostly used for organizational purposes, with some exceptions:
 	# DualWield - Indicates the skill is a dual-wield skill for thieves. The necessary off-hand weapon is indicated in dual_wield.
