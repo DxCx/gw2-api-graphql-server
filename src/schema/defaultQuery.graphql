@@ -34,3 +34,35 @@ query ItemsTest {
 		}
 	}
 }
+
+query skillsTest {
+	skills(skillIds: [5548, 9138, 41714, 46148, 9151, 40915, 9154, 5812, 12385]) {
+		name
+		type
+		description
+		chat_link
+		slot
+		categories
+		attunement
+		cost
+		dual_wield
+		flip_skill {
+			name
+		}
+		bundle_skills {
+			name
+		}
+		toolbelt_skill {
+			name
+		}
+		transform_skills {
+			name
+		}
+		next_chain {
+			name
+		}
+		prev_chain {
+			name
+		}
+	}
+}

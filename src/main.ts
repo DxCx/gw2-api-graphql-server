@@ -30,21 +30,52 @@ function verbosePrint(port, enableGraphiql) {
 }
 
 const api = gw2client();
-const itemsLoader = new DataLoader((itemIds) => {
-  return api.items().many(itemIds)
-  .then((items) => items.map((item) => {
-    if ( !item.details ) {
-      return item;
+async function flattenIds(ids, fn) {
+  const inIds = ids.reduce((prev, cur) => {
+    const moreIds = (Array.isArray(cur) ? cur : [cur]).map((x) => parseInt(x, 10));
+    return [...prev, ...moreIds];
+  }, []);
+
+  const res = await fn(inIds);
+  let i = 0;
+
+  return ids.map((v) => {
+    if ( Array.isArray(v) ) {
+      return v.map(() => res[i++]);
     }
 
-    return {
-      ...item,
-      details: {
-        root_type: item.type,
-        ...item.details,
-      },
-    };
-  }));
+    return res[i++];
+  });
+};
+
+const itemsLoader = new DataLoader((itemIds) => {
+  return flattenIds(itemIds, (x) => api.items().many(x))
+    .then((items) => items.map((item) => {
+      if ( !item.details ) {
+        return item;
+      }
+
+      return {
+        ...item,
+        details: {
+          root_type: item.type,
+          ...item.details,
+        },
+      };
+    }));
+});
+
+
+const specializationsLoader = new DataLoader((specIds) => {
+  return flattenIds(specIds, (x) => api.specializations().many(x));
+});
+
+const skillsLoader = new DataLoader((skillIds) => {
+  return flattenIds(skillIds, (x) => api.skills().many(x));
+});
+
+const traitsLoader = new DataLoader((traitIds) => {
+  return flattenIds(traitIds, (x) => api.traits().many(x));
 });
 
 export function main(options: IMainOptions) {
@@ -61,6 +92,9 @@ export function main(options: IMainOptions) {
   app.use(GRAPHQL_ROUTE, bodyParser.json(), graphqlExpress({
     context: {
       itemsLoader,
+      skillsLoader,
+      traitsLoader,
+      specializationsLoader,
     },
     schema: Schema,
   }));
