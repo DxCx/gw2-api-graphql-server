@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import {graphqlExpress, graphiqlExpress} from 'apollo-server-express';
-import {Schema} from './schema';
+import {Schema, defaultQuery} from './schema';
 import * as cors from 'cors';
 import * as helmet from 'helmet';
 import * as morgan from 'morgan';
@@ -66,7 +66,10 @@ export function main(options: IMainOptions) {
   }));
 
   if (true === options.enableGraphiql) {
-    app.use(GRAPHIQL_ROUTE, graphiqlExpress({endpointURL: GRAPHQL_ROUTE}));
+    app.use(GRAPHIQL_ROUTE, graphiqlExpress({
+      endpointURL: GRAPHQL_ROUTE,
+      query: defaultQuery,
+    }));
   }
 
   return new Promise((resolve, reject) => {
