@@ -1,0 +1,160 @@
+query ItemsTest {
+  items(itemIds: [43772, 12452, 67457]) {
+    id
+    name
+    level
+    type
+    flags
+    rarity
+    game_types
+    vendor_value
+    details {
+      ... on ItemConsumableDetails {
+        name
+        description
+        color_id
+      }
+      ... on ItemArmorDetails {
+        type
+        defense
+        infix_upgrade {
+          attributes {
+            modifier
+            attribute
+          }
+          buff {
+            skill_id
+            description
+          }
+        }
+        infusion_slots {
+          item_id
+        }
+      }
+    }
+  }
+}
+
+fragment allFacts on Fact {
+  icon
+  text
+  type
+  ... on FactAttributeAdjust {
+    value
+    target
+  }
+  ... on FactBuffConversion {
+    percent
+    source
+    target
+  }
+  ... on FactComboFinisher {
+    finisher_type
+    percent
+  }
+  ... on FactDamage {
+    hit_count
+  }
+  ... on FactDuration {
+    duration
+  }
+  ... on FactBuff {
+    status
+    description
+    apply_count
+    duration
+  }
+  ... on FactNumber {
+    value
+  }
+  ... on FactComboField {
+    field_type
+  }
+  ... on FactDistance {
+    distance
+  }
+  ... on FactRange {
+    value
+  }
+  ... on FactHeal {
+    hit_count
+  }
+  ... on FactPercent {
+    percent
+  }
+  ... on FactPrefixedBuff {
+    status
+    duration
+    description
+    duration
+    prefix {
+      icon
+      status
+      description
+    }
+  }
+  ... on FactRadius {
+    distance
+  }
+  ... on FactRecharge {
+    value
+  }
+}
+
+query skillsTest {
+  skills(skillIds: [5548, 9138, 41714, 46148, 9151, 40915, 9154, 5812, 12385]) {
+    name
+    type
+    description
+    chat_link
+    slot
+    categories
+    attunement
+    cost
+    dual_wield
+    facts {
+      ...allFacts
+    }
+    traited_facts {
+      ...allFacts
+      overrides
+      requires_trait {
+        name
+        facts {
+          ...allFacts
+        }
+      }
+    }
+    flip_skill {
+      name
+    }
+    bundle_skills {
+      name
+    }
+    toolbelt_skill {
+      name
+    }
+    transform_skills {
+      name
+    }
+    next_chain {
+      name
+    }
+    prev_chain {
+      name
+    }
+  }
+}
+
+query specializationsTest {
+  specializations(specIds: [14, 41]) {
+    name
+    profession
+    minor_traits {
+      name
+    }
+    background
+    elite
+    icon
+  }
+}

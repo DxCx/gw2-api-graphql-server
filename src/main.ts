@@ -1,11 +1,13 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import {graphqlExpress, graphiqlExpress} from 'apollo-server-express';
-import {Schema} from './schema';
+import {Schema, defaultQuery} from './schema';
 import * as cors from 'cors';
 import * as helmet from 'helmet';
 import * as morgan from 'morgan';
-import {persons, findPerson, addPerson} from './data-base/person-database';
+
+import * as DataLoader from 'dataloader';
+import { default as gw2client } from 'gw2api-client';
 
 // Default port or given one.
 export const GRAPHQL_ROUTE = "/graphql";
@@ -27,11 +29,54 @@ function verbosePrint(port, enableGraphiql) {
   }
 }
 
-export class TestConnector {
-  public get testString() {
-    return "it works from connector as well!";
-  }
-}
+const api = gw2client();
+async function flattenIds(ids, fn) {
+  const inIds = ids.reduce((prev, cur) => {
+    const moreIds = (Array.isArray(cur) ? cur : [cur]).map((x) => parseInt(x, 10));
+    return [...prev, ...moreIds];
+  }, []);
+
+  const res = await fn(inIds);
+  let i = 0;
+
+  return ids.map((v) => {
+    if ( Array.isArray(v) ) {
+      return v.map(() => res[i++]);
+    }
+
+    return res[i++];
+  });
+};
+
+const itemsLoader = new DataLoader((itemIds) => {
+  return flattenIds(itemIds, (x) => api.items().many(x))
+    .then((items) => items.map((item) => {
+      if ( !item.details ) {
+        return item;
+      }
+
+      return {
+        ...item,
+        details: {
+          root_type: item.type,
+          ...item.details,
+        },
+      };
+    }));
+});
+
+
+const specializationsLoader = new DataLoader((specIds) => {
+  return flattenIds(specIds, (x) => api.specializations().many(x));
+});
+
+const skillsLoader = new DataLoader((skillIds) => {
+  return flattenIds(skillIds, (x) => api.skills().many(x));
+});
+
+const traitsLoader = new DataLoader((traitIds) => {
+  return flattenIds(traitIds, (x) => api.traits().many(x));
+});
 
 export function main(options: IMainOptions) {
   let app = express();
@@ -44,19 +89,21 @@ export function main(options: IMainOptions) {
     app.use(GRAPHQL_ROUTE, cors());
   }
 
-  let testConnector = new TestConnector();
   app.use(GRAPHQL_ROUTE, bodyParser.json(), graphqlExpress({
     context: {
-      testConnector,
-      persons,
-      findPerson,
-      addPerson
+      itemsLoader,
+      skillsLoader,
+      traitsLoader,
+      specializationsLoader,
     },
     schema: Schema,
   }));
 
   if (true === options.enableGraphiql) {
-    app.use(GRAPHIQL_ROUTE, graphiqlExpress({endpointURL: GRAPHQL_ROUTE}));
+    app.use(GRAPHIQL_ROUTE, graphiqlExpress({
+      endpointURL: GRAPHQL_ROUTE,
+      query: defaultQuery,
+    }));
   }
 
   return new Promise((resolve, reject) => {
